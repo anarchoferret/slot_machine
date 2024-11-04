@@ -11,28 +11,30 @@ const char *symbols[] = {"🥦", "🍋", "🍊", "🍍", "🍈", "⭐"};
 GtkWidget *slot_labels[ROWS][COLS];
 GtkWidget *double_labels[ROWS];  // Array for double display labels
 GtkWidget *info_label;            // Label to display total winnings
-double total_winnings = 100.00;      // Variable to track total winnings
+double total_winnings = 20.00;      // Variable to track total winnings
+
+// Betting Defaults
+double initial_bet = 0.25;
 
 // Rigging the Game with a Bonus Score
 double bonus_score = 0;
-double broccoli_win_rig = 0.50;
-double lemon_bonus = 1;
-double orange_bonus = 2;
-double pineapple_bonus = 4;
-double melon_bonus = 8;
-double star_bonus = 16;
-
+double broccoli_win_rig = 0.25;
+double lemon_bonus = 2;
+double orange_bonus = 4;
+double pineapple_bonus = 8;
+double melon_bonus = 16;
+double star_bonus = 32;
 
 // Adjust the Winnings
-double lemon_base = 0.25;
-double orange_base = 0.50;
-double pineapple_base = 1.00;
-double melon_base = 2.00;
-double star_base = 4.00;
+double lemon_base = 0.50;
+double orange_base = 1;
+double pineapple_base = 2;
+double melon_base = 4;
+double star_base = 8;
 
 // Function to update the slots with random symbols
 void spin_slots() {
-    if (total_winnings < 0.25) {
+    if (total_winnings < initial_bet) {
         // Display total winnings in the info label
         char info_text[50];
         snprintf(info_text, sizeof(info_text), "ERROR BALANCE: %.2f", total_winnings);
@@ -40,7 +42,7 @@ void spin_slots() {
         return;
     }
     else {
-        total_winnings = (total_winnings - 0.25);
+        total_winnings = (total_winnings - initial_bet);
         // Display total winnings in the info label
         char info_text[50];
         snprintf(info_text, sizeof(info_text), "Total winnings: %.2f", total_winnings);
@@ -56,20 +58,23 @@ void spin_slots() {
         int star_score = 0;
 
         for (int j = 0; j < COLS; j++) {
+            
+            double number_calc = rand() % 1000000 +1;
             if (bonus_score > 100) {
                 bonus_score = 100;
             }
-            if (bonus_score < 0) {
-                bonus_score = 0;
+            if (bonus_score >= 0) {
+                number_calc = number_calc - (bonus_score * 10000); // Adds a bit of rigging when losing/winning too much
             }
-            double number_calc = rand() % 1000000 +1;
-            number_calc = number_calc - (bonus_score * 10000); // Adds a bit of rigging when losing/winning too muchooooooooooooo
+            else if (bonus_score < 0) {
+                number_calc = number_calc - (bonus_score * 0);
+            }
             int rand_symbol = 0;
-            if ( number_calc > 500000 ) {
+            if ( number_calc > 250000 ) {
                 rand_symbol = 0;
                 printf("Got a broccoli with: %.2f", number_calc);
             }
-            else if ( number_calc > 250000 ) {
+            else if ( number_calc > 125000 ) {
                 rand_symbol = 1;
                 printf("Got a lemon with: %.2f", number_calc);
                 lemon_score++;
@@ -87,7 +92,7 @@ void spin_slots() {
                 pineapple_score++;
                 // printf("Score for pineapple: %d\n", pineapple_score);
             }
-            else if ( number_calc >  18800) {
+            else if ( number_calc >  7812.5) {
                 rand_symbol = 4;
                 printf("Got a melon with: %.2f", number_calc);
                 melon_score++;
@@ -190,8 +195,8 @@ void spin_slots() {
                 // slot_labels[i][COLS] = "+$1.75";
                 gchar *text = g_strdup_printf("%.2f", pineapple_base);
                 gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
-                total_winnings = (total_winnings + pineapple_bonus);
-                bonus_score = bonus_score - pineapple_base;
+                total_winnings = (total_winnings + pineapple_base);
+                bonus_score = bonus_score - pineapple_bonus;
                 printf("Score for pineapple: %d\n", pineapple_score);
                 g_free(text);
             }
