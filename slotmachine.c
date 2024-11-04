@@ -13,16 +13,26 @@ GtkWidget *double_labels[ROWS];  // Array for double display labels
 GtkWidget *info_label;            // Label to display total winnings
 double total_winnings = 100.00;      // Variable to track total winnings
 
+// Rigging the Game with a Bonus Score
+double bonus_score = 0;
+double broccoli_win_rig = 0.50;
+double lemon_bonus = 1;
+double orange_bonus = 2;
+double pineapple_bonus = 4;
+double melon_bonus = 8;
+double star_bonus = 16;
+
+
 // Adjust the Winnings
-double lemon_base = 1.00;
-double orange_base = 2.00;
-double pineapple_base = 4.00;
-double melon_base = 8.00;
-double star_base = 16.00;
+double lemon_base = 0.25;
+double orange_base = 0.50;
+double pineapple_base = 1.00;
+double melon_base = 2.00;
+double star_base = 4.00;
 
 // Function to update the slots with random symbols
 void spin_slots() {
-    if (total_winnings < 1.00) {
+    if (total_winnings < 0.25) {
         // Display total winnings in the info label
         char info_text[50];
         snprintf(info_text, sizeof(info_text), "ERROR BALANCE: %.2f", total_winnings);
@@ -30,7 +40,7 @@ void spin_slots() {
         return;
     }
     else {
-        total_winnings = (total_winnings - 1.00);
+        total_winnings = (total_winnings - 0.25);
         // Display total winnings in the info label
         char info_text[50];
         snprintf(info_text, sizeof(info_text), "Total winnings: %.2f", total_winnings);
@@ -46,39 +56,46 @@ void spin_slots() {
         int star_score = 0;
 
         for (int j = 0; j < COLS; j++) {
-            int number_calc = rand() % 1000000 +1;
+            if (bonus_score > 100) {
+                bonus_score = 100;
+            }
+            if (bonus_score < 0) {
+                bonus_score = 0;
+            }
+            double number_calc = rand() % 1000000 +1;
+            number_calc = number_calc - (bonus_score * 10000); // Adds a bit of rigging when losing/winning too muchooooooooooooo
             int rand_symbol = 0;
             if ( number_calc > 500000 ) {
                 rand_symbol = 0;
-                printf("Got a broccoli with: %d\n", number_calc);
+                printf("Got a broccoli with: %.2f", number_calc);
             }
             else if ( number_calc > 250000 ) {
                 rand_symbol = 1;
-                printf("Got a lemon with: %d\n", number_calc);
+                printf("Got a lemon with: %.2f", number_calc);
                 lemon_score++;
                 // printf("Score for lemon: %d\n", lemon_score);
             }
             else if ( number_calc > 125000 ) {
                 rand_symbol = 2;
-                printf("Got a orange with: %d\n", number_calc);
+                printf("Got a orange with: %.2f", number_calc);
                 orange_score++;
                 // printf("Score for orange: %d\n", orange_score);
             }
             else if ( number_calc > 62500 ) {
                 rand_symbol = 3;
-                printf("Got a pineapple with: %d\n", number_calc);
+                printf("Got a pineapple with: %.2f", number_calc);
                 pineapple_score++;
                 // printf("Score for pineapple: %d\n", pineapple_score);
             }
             else if ( number_calc >  18800) {
                 rand_symbol = 4;
-                printf("Got a melon with: %d\n", number_calc);
+                printf("Got a melon with: %.2f", number_calc);
                 melon_score++;
                 // printf("Score for melon: %d\n", melon_score);
             }
             else {
                 rand_symbol = 5;
-                printf("Got a star with: %d\n", number_calc);
+                printf("Got a star with: %.2f", number_calc);
                 star_score++;
                 // printf("Score for star: %d\n", star_score);
             }
@@ -93,6 +110,7 @@ void spin_slots() {
                     gchar *text = g_strdup_printf("%.2f", 4.00 * lemon_base);
                     gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                     total_winnings = (total_winnings + (4.00 * lemon_base));
+                    bonus_score = bonus_score - (4 * lemon_bonus);
                     printf("Score for lemons: %d\n", lemon_score);
                     g_free(text); 
                 }
@@ -101,6 +119,7 @@ void spin_slots() {
                     gchar *text = g_strdup_printf("%.2f", 2.00 * lemon_base);
                     gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                     total_winnings = (total_winnings + (2.00 * lemon_base));
+                    bonus_score = bonus_score - (2 * lemon_bonus);
                     printf("Score for lemons: %d\n", lemon_score);
                     g_free(text); 
                 }
@@ -110,6 +129,7 @@ void spin_slots() {
                 gchar *text = g_strdup_printf("%.2f", lemon_base);
                 gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                 total_winnings = (total_winnings + lemon_base);
+                bonus_score = bonus_score - lemon_bonus;
                 printf("Score for lemons: %d\n", lemon_score);
                 g_free(text);
             }
@@ -121,6 +141,7 @@ void spin_slots() {
                     gchar *text = g_strdup_printf("%.2f", 4.00 * orange_base);
                     gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                     total_winnings = (total_winnings + (4.00 * orange_base));
+                    bonus_score = bonus_score - (4 * orange_bonus);
                     printf("Score for orange: %d\n", orange_score);
                     g_free(text);
                 }
@@ -129,6 +150,7 @@ void spin_slots() {
                     gchar *text = g_strdup_printf("%.2f", 2.00 * orange_base);
                     gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                     total_winnings = (total_winnings + (2.00 * orange_base));
+                    bonus_score = bonus_score - (2 * orange_bonus);
                     printf("Score for orange: %d\n", orange_score);
                     g_free(text);
                 }
@@ -138,6 +160,7 @@ void spin_slots() {
                 gchar *text = g_strdup_printf("%.2f", orange_base);
                 gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                 total_winnings = (total_winnings + orange_base);
+                bonus_score = bonus_score - orange_bonus;
                 printf("Score for orange: %d\n", orange_score);
                 g_free(text);
             }
@@ -149,6 +172,7 @@ void spin_slots() {
                     gchar *text = g_strdup_printf("%.2f", 4.00 * pineapple_base);
                     gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                     total_winnings = (total_winnings + (4 * pineapple_base));
+                    bonus_score = bonus_score - (4 * pineapple_bonus);
                     printf("Score for pineapple: %d\n", pineapple_score);
                     g_free(text);
                 }
@@ -157,6 +181,7 @@ void spin_slots() {
                     gchar *text = g_strdup_printf("%.2f", 2.00 * pineapple_base);
                     gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                     total_winnings = (total_winnings + (2 * pineapple_base));
+                    bonus_score = bonus_score - (2 * pineapple_bonus);
                     printf("Score for pineapple: %d\n", pineapple_score);
                     g_free(text);
                 }
@@ -165,7 +190,8 @@ void spin_slots() {
                 // slot_labels[i][COLS] = "+$1.75";
                 gchar *text = g_strdup_printf("%.2f", pineapple_base);
                 gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
-                total_winnings = (total_winnings + pineapple_base);
+                total_winnings = (total_winnings + pineapple_bonus);
+                bonus_score = bonus_score - pineapple_base;
                 printf("Score for pineapple: %d\n", pineapple_score);
                 g_free(text);
             }
@@ -177,6 +203,7 @@ void spin_slots() {
                     gchar *text = g_strdup_printf("%.2f", 4.00 * melon_base);
                     gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                     total_winnings = (total_winnings + (4.00 * melon_base));
+                    bonus_score = bonus_score - (4 * melon_bonus);
                     printf("Score for melon: %d\n", melon_score);
                     g_free(text);
                 }
@@ -185,6 +212,7 @@ void spin_slots() {
                     gchar *text = g_strdup_printf("%.2f", 2.00 * melon_base);
                     gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                     total_winnings = (total_winnings + (2.00 * melon_base));
+                    bonus_score = bonus_score - (2 * melon_bonus);
                     printf("Score for melon: %d\n", melon_score);
                     g_free(text);
                 }
@@ -194,6 +222,7 @@ void spin_slots() {
                 gchar *text = g_strdup_printf("%.2f", melon_base);
                 gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                 total_winnings = (total_winnings + melon_base);
+                bonus_score = bonus_score - melon_bonus;
                 printf("Score for melon: %d\n", melon_score);
                 g_free(text);
             }
@@ -205,6 +234,7 @@ void spin_slots() {
                     gchar *text = g_strdup_printf("%.2f", 4.00 * star_base);
                     gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                     total_winnings = (total_winnings + (4.00 * star_base));
+                    bonus_score = bonus_score - (4 * star_bonus);
                     printf("Score for star: %d\n", star_score);
                     g_free(text);
                 }
@@ -213,6 +243,7 @@ void spin_slots() {
                     gchar *text = g_strdup_printf("%.2f", 2.00 * star_base);
                     gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                     total_winnings = (total_winnings + (2.00 * star_base));
+                    bonus_score = bonus_score - (2 * star_bonus);
                     printf("Score for star: %d\n", star_score);
                     g_free(text);
                 }
@@ -222,6 +253,7 @@ void spin_slots() {
                 gchar *text = g_strdup_printf("%.2f", star_base);
                 gtk_label_set_text(GTK_LABEL(double_labels[i]), text);
                 total_winnings = (total_winnings + star_base);
+                bonus_score = bonus_score - star_bonus;
                 printf("Score for star: %d\n", star_score);
                 g_free(text);
             }
@@ -229,11 +261,13 @@ void spin_slots() {
         else {
             // slot_labels[i][COLS] = "$0";
             gtk_label_set_text(GTK_LABEL(double_labels[i]), "0");
+            bonus_score = bonus_score + broccoli_win_rig;
             printf("No score for row: %d\n", i);
         }
     }
 
-    printf("Total Money: %.2f\n", total_winnings);
+    printf("Total Money note: %.2f\n", total_winnings);
+    printf("Rigged Score: %.2f\n", bonus_score);
 
     // Display total winnings in the info label
     char info_text[50];
